@@ -10,9 +10,9 @@ from pathlib import Path
 
 
 class DataAnalyzer(QtWidgets.QMainWindow):
-    current_date = ""
     input = ""
     output = ""
+    current_folder = ""
 
     def __init__(self):
         super(DataAnalyzer, self).__init__()
@@ -21,29 +21,29 @@ class DataAnalyzer(QtWidgets.QMainWindow):
         self.init_UI()
 
     def init_UI(self):
-        self.ui.pushButton.clicked.connect(lambda: self.start())
-        self.ui.comboBox.activated.connect(self.cmb_action)
-        self.ui.listWidget.clicked.connect(self.lv_action)
+        self.ui.pushButton.clicked.connect(self.start)
+        self.ui.listWidget.clicked.connect(self.lv_date_action)
+        self.ui.listWidget_2.clicked.connect(self.lv_pic_action)
 
     def start(self):
         self. input = self.ui.textEdit.toPlainText()
         self.output = self.ui.textEdit_2.toPlainText()
-        self.ui.comboBox.addItems(
-            get_paths(self.ui.textEdit.toPlainText(),  ".LOG"))
+        items = process(self.input, self.output)
+        self.ui.listWidget.addItems(
+        items)
 
-    def lv_action(self):
-        item = self.ui.listWidget.currentItem()
-        pic_path = self.output + "/"+self.current_date+"/"+item.text()
+    def lv_pic_action(self):
+        item = self.ui.listWidget_2.currentItem()
+        pic_path = self.output + "/"+self.current_folder+"/"+item.text()
+        print(pic_path)
         self.view_pic(pic_path)
 
-    def cmb_action(self):
-        current_file = str(self.ui.comboBox.currentText())
-        self.current_date = process(self.input+"/" +
-                                    current_file, self.output)
+    def lv_date_action(self):
+        self.current_folder = self.ui.listWidget.currentItem().text()
         items = get_paths(self.ui.textEdit_2.toPlainText() +
-                          "/"+self.current_date, ".png")
+                          "/"+self.current_folder, ".png")
         for item in items:
-            self.ui.listWidget.addItem(Path(item).stem)
+            self.ui.listWidget_2.addItem(Path(item).stem)
 
     def view_pic(self, path):
         pixmap = QPixmap(path)
